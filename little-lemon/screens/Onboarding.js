@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Dimensions } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CommonActions } from '@react-navigation/native';
+import Hero from '../component/Hero';
+import { colors, themeStyles } from '../theme';
 
 const Onboarding = ({ navigation }) => {
     const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     const [isFirstNameValid, setIsFirstNameValid] = useState(false);
+    const [isLastNameValid, setIsLastNameValid] = useState(false);
     const [isEmailValid, setIsEmailValid] = useState(false);
 
     const validateFirstName = (name) => {
         const isValid = name.trim().length > 0 && /^[a-zA-Z ]*$/.test(name);
         setIsFirstNameValid(isValid);
         setFirstName(name);
+    };
+
+    const validateLastName = (name) => {
+        const isValid = name.trim().length > 0 && /^[a-zA-Z ]*$/.test(name);
+        setIsLastNameValid(isValid);
+        setLastName(name);
     };
 
     const validateEmail = (email) => {
@@ -24,39 +34,46 @@ const Onboarding = ({ navigation }) => {
 
     const completeOnboarding = async () => {
         await AsyncStorage.setItem('firstName', firstName);
+        await AsyncStorage.setItem('lastName', lastName);
         await AsyncStorage.setItem('email', email);
         await AsyncStorage.setItem('onboardingCompleted', 'true');
         navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [
-              { name: 'Profile' },
-            ],
-          })
+            CommonActions.reset({
+                index: 0,
+                routes: [
+                    {
+                        name: 'Home', params: {
+                            firstName,
+                            lastName,
+                        },
+                    },
+                ],
+            })
         );
     };
 
     return (
         <View style={styles.container}>
-            <View style={styles.header}>
-                <Image
-                    style={styles.logo}
-                    source={require('../assets/Logo.png')}
-                />
-            </View>
+            <Hero showSearch={false} />
             <View style={styles.formSection}>
-                <Text style={styles.description}>Let us get to know you</Text>
-                <Text>First Name</Text>
+                <Text style={styles.label}>First name *</Text>
                 <TextInput
                     style={styles.input}
                     placeholder="First Name"
                     onChangeText={validateFirstName}
                     value={firstName}
                 />
-                <Text>Email</Text>
+                <Text style={styles.label}>Last name *</Text>
                 <TextInput
                     style={styles.input}
-                    placeholder="Email"
+                    placeholder="Last Name"
+                    onChangeText={validateLastName}
+                    value={lastName}
+                />
+                <Text style={styles.label}>E-mail *</Text>
+                <TextInput
+                    style={styles.input}
+                    placeholder="E-mail"
                     onChangeText={validateEmail}
                     value={email}
                     keyboardType="email-address"
@@ -65,10 +82,10 @@ const Onboarding = ({ navigation }) => {
             </View>
             <View style={styles.footer}>
                 <TouchableOpacity
-                    style={styles.button}
+                    style={[styles.button, (!isFirstNameValid || !isLastNameValid || !isEmailValid) && styles.buttonDisabled]}
                     onPress={completeOnboarding}
-                    disabled={!isFirstNameValid || !isEmailValid}>
-                    <Text style={styles.buttonText}>Next</Text>
+                    disabled={!isFirstNameValid || !isLastNameValid || !isEmailValid}>
+                    <Text style={styles.buttonText}>Register</Text>
                 </TouchableOpacity>
             </View>
         </View >
@@ -81,54 +98,52 @@ const styles = StyleSheet.create({
     container: {
         width: width,
         flex: 1,
-        backgroundColor: '#fff', // Default background
-    },
-    header: {
-        backgroundColor: '#f0f0f0',
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingTop: 60,
-        paddingBottom: 30
-    },
-    logo: {
-        height: 50,
+        backgroundColor: '#fff',
     },
     formSection: {
-        flex: 0.85,
-        backgroundColor: '#c0c0c0',
-        alignItems: 'center',
-        justifyContent: 'center',
-        // paddingHorizontal: 20,
+        flex: 1,
+        backgroundColor: '#fff',
+        alignItems: 'left',
+        paddingHorizontal: 20,
+        paddingTop: 15,
     },
-    description: {
+    label: {
+        alignSelf: 'flex-start',
+        //marginLeft: width * 0.1,
         fontSize: 16,
+        fontWeight: '500',
+        marginBottom: 5,
         color: '#333',
-        marginBottom: 200,
     },
     input: {
-        height: 40,
+        height: 50,
         borderColor: 'gray',
         borderWidth: 1,
-        width: width * 0.8,
-        marginBottom: 12,
+        width: width * 0.9,
+        marginBottom: 20,
         padding: 10,
         borderRadius: 5,
+        backgroundColor: '#f8f8f8',
     },
     footer: {
-        flex: 0.15,
-        backgroundColor: '#f0f0f0',
-        alignItems: 'flex-end', // Align button to the right
-        justifyContent: 'center', // Center button vertically
-        paddingRight: 20, // Padding right for some spacing from the edge
+        padding: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     button: {
-        backgroundColor: '#c0c0c0', // Set your desired color
-        padding: 10,
-        borderRadius: 5,
+        backgroundColor: '#F4CE14',
+        paddingVertical: 15,
+        paddingHorizontal: 100,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    buttonDisabled: {
+        backgroundColor: '#cccccc',
     },
     buttonText: {
-        color: 'white', // Set text color for visibility
-        fontSize: 16,
+        color: colors.primary1,
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 
 });

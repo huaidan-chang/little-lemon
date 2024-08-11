@@ -27,6 +27,10 @@ export const themeStyles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#FFF',
     },
+    cardTitle: {
+        fontFamily: 'Karla-Bold',
+        fontSize: 16,
+    },
     titleText: {
         fontFamily: 'MarkaziText-Medium',
         fontSize: 64,

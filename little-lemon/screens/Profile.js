@@ -6,7 +6,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { themeStyles, colors } from '../theme';
 import Checkbox from 'expo-checkbox';
 
-const Profile = ({ navigation }) => {
+const Profile = ({ navigation, route }) => {
+    const { updateProfile } = route.params;
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
@@ -67,12 +68,16 @@ const Profile = ({ navigation }) => {
         await AsyncStorage.setItem('receivePasswordChangeNotification', JSON.stringify(receivePasswordChangeNotification));
         await AsyncStorage.setItem('receiveSpecialOffers', JSON.stringify(receiveSpecialOffers));
         await AsyncStorage.setItem('subscribeToNewsletter', JSON.stringify(subscribeToNewsletter));
+        updateProfile(firstName, lastName, profileImage);
         alert('Changes saved successfully!');
     };
 
     const logout = async () => {
         await AsyncStorage.clear();
-        navigation.navigate('Onboarding');
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'Onboarding' }],
+        });
     };
 
     return (
@@ -93,7 +98,7 @@ const Profile = ({ navigation }) => {
             <Text style={{fontFamily: 'Karla-ExtraBold'}}>First name</Text>
             <TextInput style={styles.input} placeholder="First name" value={firstName} onChangeText={setFirstName} />
             <Text>Last name</Text>
-            <TextInput style={styles.input} placeholder="Last name" value={lastName} onChangeText={setLastName} />
+            <TextInput style={styles.input} placeholder="Last name" value={lastName} onChangeText={setLastName}/>
             <Text>Email</Text>
             <TextInput style={styles.input} placeholder="Email" value={email} onChangeText={setEmail} />
             <Text>Phone number</Text>
@@ -206,14 +211,14 @@ const styles = StyleSheet.create({
     },
     switchRow: {
         flexDirection: 'row',
-        justifyContent: 'flex-start',  // Aligns items to the start of the row
-        alignItems: 'center',         // Keeps items vertically centered
+        justifyContent: 'flex-start',
+        alignItems: 'center', 
         marginBottom: 10,
-        paddingRight: 10,             // Right padding for some spacing at the end
+        paddingRight: 10,
     },
     label: {
         fontSize: 16,
-        marginLeft: 10,               // Adds some margin left to the label to bring it closer to the checkbox
+        marginLeft: 10,
     },
     buttonGroup: {
         flexDirection: 'row',
